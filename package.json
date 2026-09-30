@@ -1,0 +1,9 @@
+{
+  "name": "birrlink",
+  "version": "1.0.0",
+  "description": "BirrLink — EUR to ETB Exchange & Remittance Corridor",
+  "scripts": {
+    "build": "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
+    "start": "node backend/server.js"
+  }
+}
