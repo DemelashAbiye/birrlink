@@ -55,9 +55,9 @@ function AppRoutes() {
       <Route path="/about"        element={<Layout><AboutPage /></Layout>} />
       <Route path="/contact"      element={<Layout><ContactPage /></Layout>} />
 
-      {/* Supplier + Retailer */}
-      <Route path="/dashboard"        element={<ProtectedRoute roles={['supplier','retailer']}><Dashboard /></ProtectedRoute>} />
-      <Route path="/invoices"         element={<ProtectedRoute roles={['supplier','retailer']}><Invoices /></ProtectedRoute>} />
+      {/* Shared Dashboard (Supplier + Retailer + Admin Operator) */}
+      <Route path="/dashboard"        element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path="/invoices"         element={<ProtectedRoute roles={['supplier','retailer','admin']}><Invoices /></ProtectedRoute>} />
       <Route path="/invoices/new"     element={<ProtectedRoute roles={['supplier']}><NewInvoice /></ProtectedRoute>} />
       <Route path="/invoices/:id"     element={<ProtectedRoute><InvoiceDetail /></ProtectedRoute>} />
       <Route path="/retailers"        element={<ProtectedRoute roles={['supplier']}><MyRetailers /></ProtectedRoute>} />

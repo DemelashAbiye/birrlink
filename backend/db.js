@@ -130,18 +130,34 @@ for (const r of seedRates) {
   `).run(r.currency, r.symbol, r.rate);
 }
 
-// ── Seed admin user ───────────────────────────────────────────────────────────
+// ── Seed admin & operator users ───────────────────────────────────────────
 const bcrypt = require('bcryptjs');
+const adminHash = bcrypt.hashSync('admin123', 10);
 
-const adminExists = db.prepare('SELECT id FROM users WHERE role = ?').get('admin');
-if (!adminExists) {
-  const hash = bcrypt.hashSync('admin123', 10);
+// Default admin: 0900000000 / +251900000000
+const adminUser = db.prepare('SELECT id FROM users WHERE phone = ?').get('0900000000');
+if (!adminUser) {
   const adminId = uuidv4();
   db.prepare(`
     INSERT INTO users (id, name, phone, email, password, role, business, verified)
-    VALUES (?, ?, ?, ?, ?, 'admin', 'TradeLink HQ', 1)
-  `).run(adminId, 'Admin', '0900000000', 'admin@tradelink.et', hash);
+    VALUES (?, 'Admin', '0900000000', 'admin@tradelink.et', ?, 'admin', 'TradeLink HQ', 1)
+  `).run(adminId, adminHash);
   db.prepare('INSERT OR IGNORE INTO trust_scores (user_id) VALUES (?)').run(adminId);
+} else {
+  db.prepare(`UPDATE users SET password = ?, role = 'admin' WHERE id = ?`).run(adminHash, adminUser.id);
+}
+
+// Demelash Operator account: +33773552239 / dadtegy@gmail.com
+const demelashUser = db.prepare('SELECT id FROM users WHERE phone = ? OR email = ?').get('+33773552239', 'dadtegy@gmail.com');
+if (!demelashUser) {
+  const opId = uuidv4();
+  db.prepare(`
+    INSERT INTO users (id, name, phone, email, password, role, business, verified, institution, whatsapp, trust_level)
+    VALUES (?, 'DEMELASH ABIYE DEGUALE', '+33773552239', 'dadtegy@gmail.com', ?, 'admin', 'BirrLink Operator HQ', 1, 'École des Mines Saint-Étienne', '+33 7 73 55 22 39', 'Tier 1 Verified Operator')
+  `).run(opId, adminHash);
+  db.prepare('INSERT OR IGNORE INTO trust_scores (user_id) VALUES (?)').run(opId);
+} else {
+  db.prepare(`UPDATE users SET password = ?, role = 'admin', verified = 1 WHERE id = ?`).run(adminHash, demelashUser.id);
 }
 
 module.exports = db;

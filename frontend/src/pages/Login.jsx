@@ -20,7 +20,7 @@ export default function Login() {
     setErr(''); setLoading(true);
     try {
       const user = await login(phone, password);
-      nav(user.role === 'admin' ? '/admin' : '/dashboard');
+      nav('/dashboard');
     } catch (e) {
       setErr(e.response?.data?.error || 'Login failed. Check your number and password.');
     } finally { setLoading(false); }
@@ -117,21 +117,60 @@ export default function Login() {
             </Link>
           </p>
 
-          {/* Demo accounts */}
-          <div className="mt-6 p-3 bg-gray-50 rounded-lg text-xs text-gray-500 space-y-1">
-            <p className="font-semibold text-gray-600 mb-2">🧪 Demo accounts (select 🇪🇹 +251):</p>
-            <div className="grid grid-cols-3 gap-2">
-              {[
-                { role: 'Admin', num: '900000000', pass: 'admin123' },
-                { role: 'Supplier', num: '911111111', pass: 'test123' },
-                { role: 'Retailer', num: '922222222', pass: 'test123' },
-              ].map(a => (
-                <div key={a.role} className="bg-white border border-gray-200 rounded-lg p-2 text-center">
-                  <p className="font-semibold text-gray-700">{a.role}</p>
-                  <p className="text-[10px] text-gray-500">{a.num}</p>
-                  <p className="text-[10px] text-gray-400">{a.pass}</p>
+          {/* Quick-fill accounts */}
+          <div className="mt-6 p-3 bg-gray-50 rounded-xl text-xs text-gray-500 space-y-2 border border-gray-200">
+            <div className="flex items-center justify-between">
+              <p className="font-bold text-gray-700">👑 Operator & Demo Logins:</p>
+              <span className="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-medium">Click card to auto-fill</span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setPhone('+33773552239');
+                  setPassword('admin123');
+                }}
+                className="bg-emerald-50/80 border border-emerald-300 hover:bg-emerald-100 rounded-lg p-2 text-left transition-all group"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-emerald-900">👑 Demelash (Admin)</span>
+                  <span className="text-[10px] text-emerald-600 font-mono">🇫🇷 +33</span>
                 </div>
-              ))}
+                <p className="text-[10px] text-emerald-800 font-mono mt-0.5">+33 7 73 55 22 39</p>
+                <p className="text-[10px] text-emerald-600 font-mono">admin123</p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setPhone('0900000000');
+                  setPassword('admin123');
+                }}
+                className="bg-white border border-gray-200 hover:border-gray-400 rounded-lg p-2 text-left transition-all"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-gray-800">Admin (Backup)</span>
+                  <span className="text-[10px] text-gray-500 font-mono">🇪🇹 +251</span>
+                </div>
+                <p className="text-[10px] text-gray-600 font-mono mt-0.5">0900000000</p>
+                <p className="text-[10px] text-gray-400 font-mono">admin123</p>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setPhone('0911111111');
+                  setPassword('test123');
+                }}
+                className="bg-white border border-gray-200 hover:border-gray-400 rounded-lg p-2 text-left transition-all"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-gray-800">Demo User</span>
+                  <span className="text-[10px] text-gray-500 font-mono">🇪🇹 +251</span>
+                </div>
+                <p className="text-[10px] text-gray-600 font-mono mt-0.5">0911111111</p>
+                <p className="text-[10px] text-gray-400 font-mono">test123</p>
+              </button>
             </div>
           </div>
         </div>

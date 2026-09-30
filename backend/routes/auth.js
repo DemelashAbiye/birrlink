@@ -49,13 +49,31 @@ router.post('/register', (req, res) => {
 
 // POST /api/auth/login
 router.post('/login', (req, res) => {
-  const phone = (req.body.phone || '').replace(/[\s\-]/g, '');
+  const input = (req.body.phone || req.body.email || req.body.identifier || '').trim();
   const { password } = req.body;
-  if (!phone || !password) return res.status(400).json({ error: 'Phone and password required' });
+  if (!input || !password) return res.status(400).json({ error: 'Phone or email and password required' });
 
-  const user = db.prepare('SELECT * FROM users WHERE phone = ?').get(phone);
+  // Generate phone variations
+  const cleanPhone = input.replace(/[\s\-]/g, '');
+  let altPhone = cleanPhone;
+  if (cleanPhone.startsWith('+251')) {
+    altPhone = '0' + cleanPhone.slice(4); // +2519... -> 09...
+  } else if (cleanPhone.startsWith('09')) {
+    altPhone = '+251' + cleanPhone.slice(1); // 09... -> +2519...
+  } else if (cleanPhone.startsWith('+330')) {
+    altPhone = '+33' + cleanPhone.slice(4); // remove French leading zero
+  }
+
+  // Allow lookup by phone variation or email
+  const user = db.prepare(`
+    SELECT * FROM users 
+    WHERE phone = ? 
+       OR phone = ? 
+       OR LOWER(COALESCE(email, '')) = LOWER(?)
+  `).get(cleanPhone, altPhone, input);
+
   if (!user || !bcrypt.compareSync(password, user.password)) {
-    return res.status(401).json({ error: 'Invalid phone or password' });
+    return res.status(401).json({ error: 'Invalid phone, email, or password' });
   }
 
   const token = jwt.sign(
