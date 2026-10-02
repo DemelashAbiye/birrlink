@@ -29,23 +29,12 @@ export default function Layout({ children }) {
         { to: '/dashboard',      icon: <LayoutDashboard size={18} />, en: 'Dashboard',   am: 'ዳሽቦርድ' },
         { to: '/about',          icon: <Info size={18} />,            en: 'About',       am: 'ስለ እኛ' },
         { to: '/contact',        icon: <PhoneCall size={18} />,       en: 'Contact',     am: 'ያግኙን' },
-        { to: '/verify',         icon: <ShieldCheck size={18} />,     en: 'Verify Slip', am: 'ማረጋገጫ' },
         { to: '/admin',          icon: <Users size={18} />,           en: 'Admin Panel', am: 'አስተዳዳሪ' },
-      ]
-    : user
-    ? [
-        { to: '/dashboard',   icon: <LayoutDashboard size={18} />, en: 'Dashboard',   am: 'ዳሽቦርድ' },
-        { to: '/about',       icon: <Info size={18} />,            en: 'About',       am: 'ስለ እኛ' },
-        { to: '/contact',     icon: <PhoneCall size={18} />,       en: 'Contact',     am: 'ያግኙን' },
-        { to: '/verify',      icon: <ShieldCheck size={18} />,     en: 'Verify Slip', am: 'ማረጋገጫ' },
-        { to: '/profile',     icon: <UserCircle size={18} />,      en: 'Profile',     am: 'መገለጫ' },
       ]
     : [
         { to: '/dashboard',   icon: <LayoutDashboard size={18} />, en: 'Home',        am: 'ዋና ገጽ' },
         { to: '/about',       icon: <Info size={18} />,            en: 'About',       am: 'ስለ እኛ' },
         { to: '/contact',     icon: <PhoneCall size={18} />,       en: 'Contact',     am: 'ያግኙን' },
-        { to: '/verify',      icon: <ShieldCheck size={18} />,     en: 'Verify Slip', am: 'ማረጋገጫ' },
-        { to: '/login',       icon: <UserCircle size={18} />,      en: 'Operator',    am: 'ግባ' },
       ];
 
   const isActive = to => loc.pathname === to;
