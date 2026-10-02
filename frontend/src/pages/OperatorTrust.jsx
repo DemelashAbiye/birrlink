@@ -21,10 +21,20 @@ import {
 } from 'lucide-react';
 
 export default function OperatorTrust() {
-  const { lang } = useAuth();
+  const { user, lang } = useAuth();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
+
+  const isOperator = Boolean(
+    user && (
+      user.role === 'admin' ||
+      user.phone === '+33773552239' ||
+      user.phone === '0900000000' ||
+      user.email === 'demelash.deguale@etu.emse.fr' ||
+      user.email === 'dadtegy@gmail.com'
+    )
+  );
 
   useEffect(() => {
     api.get('/users/operator/trust-profile')
@@ -233,68 +243,70 @@ export default function OperatorTrust() {
           </div>
         </div>
 
-        {/* RECENT VERIFIED SETTLEMENTS FEED (PROOF OF ACTIVITY) */}
-        <div className="bg-slate-850 border border-slate-700 rounded-3xl p-6 sm:p-7 space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-700 pb-3">
-            <div className="flex items-center gap-2 font-bold text-base text-white">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
-              <h3>{t(lang, 'Recent Verified Settlements', 'የቅርብ የተረጋገጡ ክፍያዎች')}</h3>
+        {/* RECENT VERIFIED SETTLEMENTS FEED (Visible Only to Operator) */}
+        {isOperator && (
+          <div className="bg-slate-850 border border-slate-700 rounded-3xl p-6 sm:p-7 space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-700 pb-3">
+              <div className="flex items-center gap-2 font-bold text-base text-white">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                <h3>{t(lang, 'Recent Verified Settlements (Admin View)', 'የቅርብ የተረጋገጡ ክፍያዎች')}</h3>
+              </div>
+              <span className="text-xs text-slate-400 font-mono">
+                Live Audited Log
+              </span>
             </div>
-            <span className="text-xs text-slate-400 font-mono">
-              Live Audited Log
-            </span>
-          </div>
 
-          {(!settlements || settlements.length === 0) ? (
-            <div className="text-center py-8 bg-slate-900/60 rounded-2xl border border-slate-800 text-slate-400 text-xs space-y-1">
-              <p className="font-semibold text-slate-300">Live Transaction Log Active</p>
-              <p className="text-[11px] text-slate-500">All transfers are recorded cryptographically as settlements are completed with authentic bank references.</p>
-            </div>
-          ) : (
-            <div className="space-y-2.5">
-              {settlements.map(s => (
-                <div key={s.id} className="bg-slate-900/90 border border-slate-800 hover:border-slate-700 p-3.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-mono font-bold text-xs shrink-0">
-                      €{s.amount_eur}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-bold text-white">
-                          {formatCurrency(s.amount_eur, 'EUR')} ➔ {formatETB(s.amount_etb)}
-                        </p>
-                        <span className="badge bg-emerald-500/10 text-emerald-300 text-[10px] font-mono">
-                          {s.bank_name?.includes('Telebirr') ? 'Telebirr' : 'CBE'}
-                        </span>
+            {(!settlements || settlements.length === 0) ? (
+              <div className="text-center py-8 bg-slate-900/60 rounded-2xl border border-slate-800 text-slate-400 text-xs space-y-1">
+                <p className="font-semibold text-slate-300">Live Transaction Log Active</p>
+                <p className="text-[11px] text-slate-500">All transfers are recorded cryptographically as settlements are completed with authentic bank references.</p>
+              </div>
+            ) : (
+              <div className="space-y-2.5">
+                {settlements.map(s => (
+                  <div key={s.id} className="bg-slate-900/90 border border-slate-800 hover:border-slate-700 p-3.5 rounded-2xl flex flex-wrap items-center justify-between gap-3 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-mono font-bold text-xs shrink-0">
+                        €{s.amount_eur}
                       </div>
-                      <p className="text-xs text-slate-400 font-mono mt-0.5">
-                        Ref: <strong className="text-slate-300">{s.cbe_ref}</strong> · {s.beneficiary}
-                      </p>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-bold text-white">
+                            {formatCurrency(s.amount_eur, 'EUR')} ➔ {formatETB(s.amount_etb)}
+                          </p>
+                          <span className="badge bg-emerald-500/10 text-emerald-300 text-[10px] font-mono">
+                            {s.bank_name?.includes('Telebirr') ? 'Telebirr' : 'CBE'}
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-400 font-mono mt-0.5">
+                          Ref: <strong className="text-slate-300">{s.cbe_ref}</strong> · {s.beneficiary}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="text-right flex items-center gap-3">
+                      <div className="text-xs">
+                        <span className="text-emerald-400 font-semibold block">✅ Settled in {s.settled_mins}m</span>
+                        <span className="text-[10px] text-slate-500">{s.created_at}</span>
+                      </div>
+                      <Link
+                        to={`/receipt/${s.id}`}
+                        className="p-2 rounded-lg bg-slate-800 text-slate-400 hover:text-emerald-400 transition-colors"
+                        title="Audit this transfer"
+                      >
+                        <ChevronRight size={16} />
+                      </Link>
                     </div>
                   </div>
+                ))}
+              </div>
+            )}
 
-                  <div className="text-right flex items-center gap-3">
-                    <div className="text-xs">
-                      <span className="text-emerald-400 font-semibold block">✅ Settled in {s.settled_mins}m</span>
-                      <span className="text-[10px] text-slate-500">{s.created_at}</span>
-                    </div>
-                    <Link
-                      to={`/receipt/${s.id}`}
-                      className="p-2 rounded-lg bg-slate-800 text-slate-400 hover:text-emerald-400 transition-colors"
-                      title="Audit this transfer"
-                    >
-                      <ChevronRight size={16} />
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <p className="text-center text-xs text-slate-500 pt-2">
-            🔒 All transactions recorded cryptographically with locked Euro exchange rates.
-          </p>
-        </div>
+            <p className="text-center text-xs text-slate-500 pt-2">
+              🔒 All transactions recorded cryptographically with locked Euro exchange rates.
+            </p>
+          </div>
+        )}
 
         {/* BOTTOM WHATSAPP CALL TO ACTION */}
         <div className="bg-gradient-to-r from-emerald-900/60 to-slate-900 border border-emerald-600/40 p-6 rounded-3xl text-center space-y-4">

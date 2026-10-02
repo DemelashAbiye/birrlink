@@ -493,19 +493,19 @@ export default function Dashboard() {
       {/* About BirrLink & Direct Clickable Contact Channels (Telegram, WhatsApp, Instagram, Email, Phone) */}
       <AboutContactSection showAbout={true} showContact={true} />
 
-      {/* Recent Verified Digital Receipts & Bank Settlement Slips */}
-      <div className="card p-5 space-y-4">
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <div>
-            <h2 className="font-bold text-gray-900 text-sm flex items-center gap-2">
-              <Receipt size={18} className="text-emerald-600" />
-              <span>{t(lang, 'Recent Transactions', 'የቅርብ ጊዜ ዝውውሮች')}</span>
-            </h2>
-            <p className="text-xs text-gray-500">
-              {t(lang, 'Every transaction generates a tamper-proof digital certificate verifiable by bank SMS reference', 'እያንዳንዱ ልውውጥ በባንክ ሪፈረንስ የተረጋገጠ ህጋዊ ዲጂታል ደረሰኝ አለው')}
-            </p>
-          </div>
-          {isOperator && (
+      {/* Recent Verified Digital Receipts & Bank Settlement Slips (Visible Only to Demelash / Admin Operator) */}
+      {isOperator && (
+        <div className="card p-5 space-y-4">
+          <div className="flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h2 className="font-bold text-gray-900 text-sm flex items-center gap-2">
+                <Receipt size={18} className="text-emerald-600" />
+                <span>{t(lang, 'Operator Ledger: Recent Transactions', 'የአስተዳዳሪ መዝገብ፡ የቅርብ ጊዜ ዝውውሮች')}</span>
+              </h2>
+              <p className="text-xs text-gray-500">
+                {t(lang, 'Every transaction generates a tamper-proof digital certificate verifiable by bank SMS reference', 'እያንዳንዱ ልውውጥ በባንክ ሪፈረንስ የተረጋገጠ ህጋዊ ዲጂታል ደረሰኝ አለው')}
+              </p>
+            </div>
             <button
               onClick={() => setReceiptModalOpen(true)}
               className="text-xs text-emerald-700 hover:text-emerald-800 font-bold flex items-center gap-1 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg border border-emerald-200 transition-colors"
@@ -513,25 +513,23 @@ export default function Dashboard() {
             >
               <span>+ Create Receipt</span>
             </button>
-          )}
-        </div>
+          </div>
 
-        {settlements.length === 0 ? (
-          <div className="text-center py-8 bg-gray-50/70 border border-dashed border-gray-200 rounded-2xl text-gray-500 text-xs space-y-2">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
-              <Receipt size={24} />
-            </div>
-            <p className="font-bold text-gray-800 text-sm">
-              {t(lang, 'No Public Settlements Yet', 'ምንም የተመዘገበ ክፍያ የለም')}
-            </p>
-            <p className="text-gray-500 max-w-sm mx-auto text-[11px]">
-              {t(
-                lang,
-                'Transfers will appear here only when you execute a real settlement and generate an official receipt with an authentic CBE / Telebirr reference code.',
-                'እውነተኛ ልውውጦችን ሲያከናውኑ እና የባንክ ማረጋገጫ ኮድ ሲያስገቡ እዚህ በቀጥታ ይመዘገባሉ።'
-              )}
-            </p>
-            {isOperator && (
+          {settlements.length === 0 ? (
+            <div className="text-center py-8 bg-gray-50/70 border border-dashed border-gray-200 rounded-2xl text-gray-500 text-xs space-y-2">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
+                <Receipt size={24} />
+              </div>
+              <p className="font-bold text-gray-800 text-sm">
+                {t(lang, 'No Settlements Yet', 'ምንም የተመዘገበ ክፍያ የለም')}
+              </p>
+              <p className="text-gray-500 max-w-sm mx-auto text-[11px]">
+                {t(
+                  lang,
+                  'Transfers will appear here only when you execute a real settlement and generate an official receipt with an authentic CBE / Telebirr reference code.',
+                  'እውነተኛ ልውውጦችን ሲያከናውኑ እና የባንክ ማረጋገጫ ኮድ ሲያስገቡ እዚህ በቀጥታ ይመዘገባሉ።'
+                )}
+              </p>
               <div className="pt-1">
                 <button
                   type="button"
@@ -541,66 +539,64 @@ export default function Dashboard() {
                   <span>{t(lang, '+ Generate First Digital Receipt', '+ የመጀመሪያውን ዲጂታል ደረሰኝ ፍጠር')}</span>
                 </button>
               </div>
-            )}
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="border-b text-gray-500 text-left">
-                  <th className="py-2.5">Receipt ID</th>
-                  <th className="py-2.5">Type</th>
-                  <th className="py-2.5">Beneficiary / Bank</th>
-                  <th className="py-2.5 text-right">Amount (EUR)</th>
-                  <th className="py-2.5 text-right">Paid (ETB)</th>
-                  <th className="py-2.5 text-center">Bank Reference</th>
-                  <th className="py-2.5 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {settlements.slice(0, 6).map((s) => {
-                  const isPilotRow = s.transfer_type === 'Pilot Test' || s.transfer_type?.includes('Pilot');
-                  return (
-                    <tr key={s.id} className="hover:bg-gray-50/80 transition-colors">
-                      <td className="py-2.5 font-mono font-bold text-gray-800">
-                        #{s.id}
-                      </td>
-                      <td className="py-2.5">
-                        {isPilotRow ? (
-                          <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">
-                            🧪 Pilot
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b text-gray-500 text-left">
+                    <th className="py-2.5">Receipt ID</th>
+                    <th className="py-2.5">Type</th>
+                    <th className="py-2.5">Beneficiary / Bank</th>
+                    <th className="py-2.5 text-right">Amount (EUR)</th>
+                    <th className="py-2.5 text-right">Paid (ETB)</th>
+                    <th className="py-2.5 text-center">Bank Reference</th>
+                    <th className="py-2.5 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {settlements.slice(0, 6).map((s) => {
+                    const isPilotRow = s.transfer_type === 'Pilot Test' || s.transfer_type?.includes('Pilot');
+                    return (
+                      <tr key={s.id} className="hover:bg-gray-50/80 transition-colors">
+                        <td className="py-2.5 font-mono font-bold text-gray-800">
+                          #{s.id}
+                        </td>
+                        <td className="py-2.5">
+                          {isPilotRow ? (
+                            <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold">
+                              🧪 Pilot
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
+                              ⚡ Standard
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-2.5">
+                          <span className="font-semibold text-gray-900 block">{s.beneficiary}</span>
+                          <span className="text-[10px] text-gray-400">{s.bank_name}</span>
+                        </td>
+                        <td className="py-2.5 text-right font-mono font-semibold text-gray-900">
+                          €{Number(s.amount_eur).toFixed(2)}
+                        </td>
+                        <td className="py-2.5 text-right font-mono font-bold text-emerald-600">
+                          ETB {Number(s.amount_etb).toLocaleString('en-US', { minimumFractionDigits: 1 })}
+                        </td>
+                        <td className="py-2.5 text-center font-mono text-[11px] text-gray-600">
+                          <span className="bg-gray-100 px-2 py-0.5 rounded border border-gray-200">
+                            {s.cbe_ref}
                           </span>
-                        ) : (
-                          <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold">
-                            ⚡ Standard
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-2.5">
-                        <span className="font-semibold text-gray-900 block">{s.beneficiary}</span>
-                        <span className="text-[10px] text-gray-400">{s.bank_name}</span>
-                      </td>
-                      <td className="py-2.5 text-right font-mono font-semibold text-gray-900">
-                        €{Number(s.amount_eur).toFixed(2)}
-                      </td>
-                      <td className="py-2.5 text-right font-mono font-bold text-emerald-600">
-                        ETB {Number(s.amount_etb).toLocaleString('en-US', { minimumFractionDigits: 1 })}
-                      </td>
-                      <td className="py-2.5 text-center font-mono text-[11px] text-gray-600">
-                        <span className="bg-gray-100 px-2 py-0.5 rounded border border-gray-200">
-                          {s.cbe_ref}
-                        </span>
-                      </td>
-                      <td className="py-2.5 text-right">
-                        <div className="inline-flex items-center justify-end gap-2">
-                          <Link
-                            to={`/receipt/${s.id}`}
-                            className="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-800 font-bold hover:underline"
-                          >
-                            <span>View Slip</span>
-                            <ExternalLink size={11} />
-                          </Link>
-                          {isOperator && (
+                        </td>
+                        <td className="py-2.5 text-right">
+                          <div className="inline-flex items-center justify-end gap-2">
+                            <Link
+                              to={`/receipt/${s.id}`}
+                              className="inline-flex items-center gap-1 text-emerald-600 hover:text-emerald-800 font-bold hover:underline"
+                            >
+                              <span>View Slip</span>
+                              <ExternalLink size={11} />
+                            </Link>
                             <button
                               type="button"
                               onClick={() => handleDeleteSettlement(s)}
@@ -610,67 +606,67 @@ export default function Dashboard() {
                             >
                               <Trash2 size={13} className={deletingId === s.id ? 'animate-spin' : ''} />
                             </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* Dedicated Admin Section: Manage & Delete Recent Transactions */}
-        {isOperator && settlements.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-rose-100 bg-rose-50/70 rounded-2xl p-4 space-y-3">
-            <div className="flex items-center justify-between flex-wrap gap-2">
-              <div className="flex items-center gap-2 text-rose-950 font-bold text-xs">
-                <span className="p-1.5 rounded-lg bg-rose-200 text-rose-800">
-                  <Trash2 size={14} />
-                </span>
-                <span>{t(lang, 'Admin Management: Delete Recent Transactions', 'የአስተዳዳሪ ክፍል፡ የቅርብ ጊዜ ልውውጦችን ሰርዝ')}</span>
-                <span className="text-[10px] bg-rose-200 text-rose-900 font-mono px-2 py-0.5 rounded-full font-bold">
-                  Demelash Only
-                </span>
-              </div>
-              <p className="text-[11px] text-rose-700">
-                {t(lang, 'Click "Delete" to permanently remove any transaction from the public ledger.', 'ማናቸውንም ልውውጥ ከመዝገቡ እስከመጨረሻው ለማጥፋት "ሰርዝ" የሚለውን ይጫኑ።')}
-              </p>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
+          )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
-              {settlements.map((s) => (
-                <div
-                  key={`admin-del-${s.id}`}
-                  className="bg-white p-3 rounded-xl border border-rose-200 shadow-sm flex items-center justify-between gap-3"
-                >
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-mono font-bold text-xs text-gray-900">#{s.id}</span>
-                      <span className="text-[10px] text-gray-500 truncate">· {s.bank_name}</span>
-                    </div>
-                    <p className="text-xs font-semibold text-gray-800 truncate">{s.beneficiary}</p>
-                    <p className="text-[11px] text-emerald-700 font-mono font-medium">
-                      €{Number(s.amount_eur).toFixed(2)} ➔ ETB {Number(s.amount_etb).toLocaleString()}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => handleDeleteSettlement(s)}
-                    disabled={deletingId === s.id}
-                    className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-bold transition-all shadow-sm disabled:opacity-50"
-                    title={t(lang, 'Delete this transaction', 'ይህን ልውውጥ ሰርዝ')}
-                  >
-                    <Trash2 size={12} className={deletingId === s.id ? 'animate-spin' : ''} />
-                    <span>{deletingId === s.id ? t(lang, 'Deleting...', 'እየሰረዘ...') : t(lang, 'Delete', 'ሰርዝ')}</span>
-                  </button>
+          {/* Dedicated Admin Section: Manage & Delete Recent Transactions */}
+          {settlements.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-rose-100 bg-rose-50/70 rounded-2xl p-4 space-y-3">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="flex items-center gap-2 text-rose-950 font-bold text-xs">
+                  <span className="p-1.5 rounded-lg bg-rose-200 text-rose-800">
+                    <Trash2 size={14} />
+                  </span>
+                  <span>{t(lang, 'Admin Management: Delete Recent Transactions', 'የአስተዳዳሪ ክፍል፡ የቅርብ ጊዜ ልውውጦችን ሰርዝ')}</span>
+                  <span className="text-[10px] bg-rose-200 text-rose-900 font-mono px-2 py-0.5 rounded-full font-bold">
+                    Demelash Only
+                  </span>
                 </div>
-              ))}
+                <p className="text-[11px] text-rose-700">
+                  {t(lang, 'Click "Delete" to permanently remove any transaction from the ledger.', 'ማናቸውንም ልውውጥ ከመዝገቡ እስከመጨረሻው ለማጥፋት "ሰርዝ" የሚለውን ይጫኑ።')}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                {settlements.map((s) => (
+                  <div
+                    key={`admin-del-${s.id}`}
+                    className="bg-white p-3 rounded-xl border border-rose-200 shadow-sm flex items-center justify-between gap-3"
+                  >
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-mono font-bold text-xs text-gray-900">#{s.id}</span>
+                        <span className="text-[10px] text-gray-500 truncate">· {s.bank_name}</span>
+                      </div>
+                      <p className="text-xs font-semibold text-gray-800 truncate">{s.beneficiary}</p>
+                      <p className="text-[11px] text-emerald-700 font-mono font-medium">
+                        €{Number(s.amount_eur).toFixed(2)} ➔ ETB {Number(s.amount_etb).toLocaleString()}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteSettlement(s)}
+                      disabled={deletingId === s.id}
+                      className="shrink-0 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 active:scale-95 text-white text-xs font-bold transition-all shadow-sm disabled:opacity-50"
+                      title={t(lang, 'Delete this transaction', 'ይህን ልውውጥ ሰርዝ')}
+                    >
+                      <Trash2 size={12} className={deletingId === s.id ? 'animate-spin' : ''} />
+                      <span>{deletingId === s.id ? t(lang, 'Deleting...', 'እየሰረዘ...') : t(lang, 'Delete', 'ሰርዝ')}</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
 
       {/* 3-Point Ironclad Reliability Guarantees */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
