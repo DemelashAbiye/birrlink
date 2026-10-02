@@ -30,18 +30,18 @@ export default function Dashboard() {
 
   useEffect(() => {
     Promise.all([
-      api.get('/invoices'),
-      user.role === 'retailer' ? api.get('/users/me/score') : Promise.resolve(null),
+      user ? api.get('/invoices').catch(() => ({ data: [] })) : Promise.resolve({ data: [] }),
+      user?.role === 'retailer' ? api.get('/users/me/score').catch(() => null) : Promise.resolve(null),
       api.get('/rates').catch(() => ({ data: [] })),
       api.get('/users/settlements').catch(() => ({ data: [] }))
     ]).then(([inv, sc, ratesRes, setRes]) => {
-      setInvoices(inv.data);
+      setInvoices(inv.data || []);
       if (sc) setScore(sc.data);
       const eur = ratesRes.data?.find(r => r.currency === 'EUR');
       if (eur) setEurRate(eur.rate_to_etb);
       if (setRes.data) setSettlements(setRes.data);
     }).finally(() => setLoading(false));
-  }, []);
+  }, [user]);
 
   const [deletingId, setDeletingId] = useState(null);
 

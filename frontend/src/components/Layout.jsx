@@ -78,23 +78,37 @@ export default function Layout({ children }) {
             <button onClick={toggleLang} className="p-2 hover:bg-white/10 rounded-lg" title="Toggle language">
               <Globe size={18} />
             </button>
-            <Link to="/notifications" className="relative p-2 hover:bg-white/10 rounded-lg">
-              <Bell size={18} />
-              {unread > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 rounded-full text-[10px] flex items-center justify-center font-bold">
-                  {unread > 9 ? '9+' : unread}
-                </span>
-              )}
-            </Link>
-            <div className="hidden md:flex items-center gap-2 pl-2 border-l border-white/20">
-              <Link to="/profile" className="text-right hover:opacity-80 transition-opacity">
-                <p className="text-xs font-semibold leading-tight">{user?.name}</p>
-                <p className="text-[10px] text-green-200 capitalize">{user?.role}</p>
-              </Link>
-              <button onClick={doLogout} className="p-2 hover:bg-white/10 rounded-lg" title="Logout">
-                <LogOut size={18} />
-              </button>
-            </div>
+            {user ? (
+              <>
+                <Link to="/notifications" className="relative p-2 hover:bg-white/10 rounded-lg">
+                  <Bell size={18} />
+                  {unread > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 rounded-full text-[10px] flex items-center justify-center font-bold">
+                      {unread > 9 ? '9+' : unread}
+                    </span>
+                  )}
+                </Link>
+                <div className="hidden md:flex items-center gap-2 pl-2 border-l border-white/20">
+                  <Link to="/profile" className="text-right hover:opacity-80 transition-opacity">
+                    <p className="text-xs font-semibold leading-tight">{user?.name}</p>
+                    <p className="text-[10px] text-green-200 capitalize">{user?.role}</p>
+                  </Link>
+                  <button onClick={doLogout} className="p-2 hover:bg-white/10 rounded-lg" title="Logout">
+                    <LogOut size={18} />
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="hidden md:flex items-center gap-2 pl-2 border-l border-white/20">
+                <Link
+                  to="/login"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-white/15 hover:bg-white/25 text-white transition-colors border border-white/20"
+                >
+                  <UserCircle size={15} />
+                  <span>{lang === 'am' ? 'የአስተዳዳሪ መግቢያ' : 'Admin Login'}</span>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
         {/* Mobile nav */}
@@ -108,9 +122,11 @@ export default function Layout({ children }) {
                 {n.icon} {lang === 'am' ? n.am : n.en}
               </Link>
             ))}
-            <button onClick={doLogout} className="flex items-center gap-2 px-3 py-2 text-sm w-full hover:bg-white/10 rounded-lg">
-              <LogOut size={18} /> Logout
-            </button>
+            {user && (
+              <button onClick={doLogout} className="flex items-center gap-2 px-3 py-2 text-sm w-full hover:bg-white/10 rounded-lg">
+                <LogOut size={18} /> Logout
+              </button>
+            )}
           </div>
         )}
       </header>

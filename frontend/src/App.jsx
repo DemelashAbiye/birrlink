@@ -40,23 +40,25 @@ function ProtectedRoute({ children, roles }) {
 
 function AppRoutes() {
   const { user } = useAuth();
-  const home = user ? (user.role === 'admin' ? '/admin' : '/dashboard') : '/login';
 
   return (
     <Routes>
-      {/* Public */}
-      <Route path="/login"        element={user ? <Navigate to={home} /> : <Login />} />
-      <Route path="/register"     element={user ? <Navigate to="/dashboard" /> : <Register />} />
+      {/* Public Pages — Open to all visitors with zero login prompts */}
+      <Route path="/"             element={<Layout><Dashboard /></Layout>} />
+      <Route path="/dashboard"    element={<Layout><Dashboard /></Layout>} />
+      <Route path="/about"        element={<Layout><AboutPage /></Layout>} />
+      <Route path="/contact"      element={<Layout><ContactPage /></Layout>} />
       <Route path="/verify"       element={<PublicVerify />} />
       <Route path="/verify/:id"   element={<PublicVerify />} />
       <Route path="/receipt"      element={<DigitalReceipt />} />
       <Route path="/receipt/:id"  element={<DigitalReceipt />} />
       <Route path="/trust"        element={<OperatorTrust />} />
-      <Route path="/about"        element={<Layout><AboutPage /></Layout>} />
-      <Route path="/contact"      element={<Layout><ContactPage /></Layout>} />
 
-      {/* Shared Dashboard (Supplier + Retailer + Admin Operator) */}
-      <Route path="/dashboard"        element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      {/* Auth Pages (for Demelash / Admin Operator) */}
+      <Route path="/login"        element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
+      <Route path="/register"     element={user ? <Navigate to="/dashboard" replace /> : <Register />} />
+
+      {/* B2B / Invoices (Protected) */}
       <Route path="/invoices"         element={<ProtectedRoute roles={['supplier','retailer','admin']}><Invoices /></ProtectedRoute>} />
       <Route path="/invoices/new"     element={<ProtectedRoute roles={['supplier']}><NewInvoice /></ProtectedRoute>} />
       <Route path="/invoices/:id"     element={<ProtectedRoute><InvoiceDetail /></ProtectedRoute>} />
@@ -72,9 +74,8 @@ function AppRoutes() {
       <Route path="/admin/overdue"    element={<ProtectedRoute roles={['admin']}><AdminOverdue /></ProtectedRoute>} />
       <Route path="/admin/invoices/:id" element={<ProtectedRoute roles={['admin']}><InvoiceDetail /></ProtectedRoute>} />
 
-      {/* Catch-all */}
-      <Route path="/" element={<Navigate to={home} />} />
-      <Route path="*" element={<Navigate to={home} />} />
+      {/* Catch-all redirect to public homepage */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
